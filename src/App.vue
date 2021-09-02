@@ -9,6 +9,14 @@
         <Tab label="Bar" id="bar">
             <p>This tab is about Bar</p>
         </Tab>
+
+        <Tab label="Baz" id="baz">
+            <p>This tab is about Baz</p>
+        </Tab>
+
+        <Tab label="Quux" id="quux" :disabled="true">
+            <p>This tab is about Quux</p>
+        </Tab>
     </Tabs>
 </template>
 

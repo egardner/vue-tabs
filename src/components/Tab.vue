@@ -1,7 +1,11 @@
 <template>
 	<div 
-		class="vue-tab"
 		v-show="tab.isActive"
+		:id="id"
+		:aria-hidden="!tab.isActive"
+		:aria-labelledby="`${id}-label`"
+		class="vue-tab"
+		role="tabpanel"
 	>
 		<slot></slot>
 	</div>
@@ -30,7 +34,6 @@ const props = defineProps( {
 	}
 } );
 
-// The data for the current tab represented by this component instance
 const tab = reactive( inject( 'tabsData' )[ props.id ] );
 </script>
 

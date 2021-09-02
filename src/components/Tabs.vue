@@ -1,8 +1,8 @@
 <template>
 	<div class="vue-tabs">
-		<div class="vue-tabs__header" role="tablist">
+		<div class="vue-tabs__header">
 			<div 
-				class="vue-tabs__header__list"
+				class="vue-tabs__list"
 				role="tablist"
 				tabindex="0"
 				:aria-activedescendant="currentTabId"
@@ -16,7 +16,8 @@
 					:id="tab.id + '-label'"
 					:aria-selected="tab.id === currentTabId"
 					:aria-controls="tab.id"
-					class="vue-tabs__header__list__item"
+					:class="getLabelClasses( tab.id )"
+					class="vue-tabs__list__item"
 					:key="index"
 					role="tab"
 					tabindex="-1"
@@ -44,6 +45,7 @@
  * @property {string} id
  * @property {string} label
  * @property {boolean} isActive
+ * @property {boolean} disabled
  */
 
 /**
@@ -91,19 +93,26 @@ const tabsData = reactive( useSlots().default().reduce( ( map, item, currentInde
 		map[ item.props.id ] = {
 			id: item.props.id,
 			label: item.props.label,
-			isActive: isActive( item, currentIndex )
+			isActive: isActive( item, currentIndex ),
+			disabled: item.props.disabled
 		};
 	}
 
 	return map;
 }, {} ) );
 
+/**
+ * Computed ref that returns a string
+ */
 const currentTabId = computed( () => {
 	return Object.values( tabsData ).find( ( tab ) => {
 		return tab.isActive === true;
 	} ).id;
 } );
 
+/**
+ * Computed ref that returns a number
+ */
 const currentTabIndex = computed( () => {
 	return Object.keys( tabsData ).findIndex( ( id ) => {
 		// currentTabId is a reactive object so we need to check its "value"
@@ -116,9 +125,22 @@ const currentTabIndex = computed( () => {
  * @emits tabchange
  */
 function select ( id ) {
+	if ( tabsData[ id ].disabled ) return;
+
 	Object.keys( tabsData ).forEach( id => { tabsData[ id ].isActive = false; });
 	tabsData[ id ].isActive = true;
 	emit( 'tabchange', id );
+}
+
+/**
+ * @param {string} id
+ * @returns {Object.<string, boolean>} class object
+ */
+function getLabelClasses( id ) {
+	return {
+		'vue-tabs__list__item--current': id === currentTabId.value,
+		'vue-tabs__list__item--disabled': tabsData[ id ].disabled,
+	}
 }
 
 /**
@@ -127,10 +149,7 @@ function select ( id ) {
 function next () {
 	const ids = Object.keys( tabsData );
 	const nextIndex = currentTabIndex.value + 1
-
-	if ( ids.indexOf( nextIndex ) > -1 ) {
-		select( nextIndex );
-	}
+	if ( ids[ nextIndex ] ) select( ids[ nextIndex ] );
 }
 
 /**
@@ -139,15 +158,67 @@ function next () {
 function prev () {
 	const ids = Object.keys( tabsData );
 	const prevIndex = currentTabIndex.value - 1
-
-	if ( ids.indexOf( prevIndex ) > -1 ) {
-		select( prevIndex );
-	}
+	if ( ids[ prevIndex ] ) select( ids[ prevIndex ] );
 }
 
 // Provide the tabsData object to the child Tab components
 provide( 'tabsData', tabsData );
 </script>
 
-<style>
+<style lang="postcss">
+.vue-tabs {
+	&__header {
+		align-items: flex-end;
+		box-shadow: inset 0 -1px 0 0 var(--border-color-base);
+		display: flex;
+		justify-content: space-between;
+	}
+
+	&__list {
+		display: flex;
+
+		&__item {
+			cursor: pointer;
+			font-weight: bold;
+			padding: var(--padding-base);
+			transition: ease-in-out color 100ms, ease-in-out box-shadow 100ms;
+			white-space: nowrap;
+
+			&:hover {
+				box-shadow: inset 0 -2px 0 0 var(--color-primary--hover);
+				color: var(--color-primary--hover);
+			}
+
+			&:active {
+				box-shadow: inset 0 -2px 0 0 var(--color-primary--active);
+				color: var(--color-primary--active);
+			}
+
+			&:focus {
+				outline: 0;
+			}
+
+			&--current {
+				box-shadow: inset 0 -2px 0 0 var(--color-primary);
+				color: var(--color-primary);
+			}
+
+			&--disabled {
+				color: var(--color-base--disabled);
+				cursor: not-allowed;
+
+				&:hover,
+				&:active {
+					box-shadow: unset;
+					color: var(--color-base--disabled);
+				}
+			}
+		}
+	}
+
+	&__content {
+		padding: var(--padding-base);
+	}
+}
+
 </style>
