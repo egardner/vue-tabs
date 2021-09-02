@@ -29,7 +29,9 @@ const onTabChange = ( id ) => {
 };
 </script>
 
-<style>
+<style lang="postcss">
+@import 'wikimedia-ui-base/wikimedia-ui-base.css';
+
 #app {
     font-family: var( --font-family-base );
     -webkit-font-smoothing: antialiased;

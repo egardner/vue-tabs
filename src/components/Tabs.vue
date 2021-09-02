@@ -166,6 +166,8 @@ provide( 'tabsData', tabsData );
 </script>
 
 <style lang="postcss">
+@import 'wikimedia-ui-base/wikimedia-ui-base.css';
+
 .vue-tabs {
 	&__header {
 		align-items: flex-end;

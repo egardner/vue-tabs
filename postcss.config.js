@@ -1,7 +1,10 @@
+const customProperties = require( 'postcss-custom-properties' );
+
 module.exports = {
 	plugins: [
 		require( 'autoprefixer' ),
 		require( 'postcss-nested' ),
-		require( 'postcss-custom-properties' )
+		customProperties( { preserve: false } ),
+		require( 'postcss-remove-root' )
 	]
 };
