@@ -12,6 +12,8 @@
 </template>
 
 <script setup>
+// @ts-check
+
 import { reactive, inject } from 'vue';
 
 // Tab instances must have a label and an id; the latter must be unique
@@ -34,6 +36,9 @@ const props = defineProps( {
 	}
 } );
 
+/**
+ * @type {import("../types").TabData}
+ */
 const tab = reactive( inject( 'tabsData' )[ props.id ] );
 </script>
 

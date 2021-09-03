@@ -38,21 +38,7 @@
 </template>
 
 <script setup>
-/**
- * Data for a single tab
- *
- * @typedef {Object} TabData
- * @property {string} id
- * @property {string} label
- * @property {boolean} isActive
- * @property {boolean} disabled
- */
-
-/**
- * Map containing all data for all tabs, keyed by tab id.
- *
- * @typedef {Object.<string, TabData>} TabsData
- */
+// @ts-check
 
 import {
 	computed,
@@ -80,9 +66,13 @@ const emit = defineEmits( [ 'tabchange' ] );
  * content is always an array (of vdom nodes), but we want to reduce this to a
  * single keyed object for easier access to specific tabs.
  *
- * @type {TabsData}
+ * @type {import("../types").TabsData}
  */
 const tabsData = reactive( useSlots().default().reduce( ( map, item, currentIndex ) => {
+	/**
+	 * @param {import("vue").VNode<import("vue").RendererNode, import("vue").RendererElement, { [key: string]: any; }>} item
+	 * @param {number} currentIndex
+	 */
 	function isActive( item, currentIndex ) {
 		return props.initialActive ? 
 			( item.props.id === props.initialActive ) : 

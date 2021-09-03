@@ -56,38 +56,48 @@ available here (`defineProps`, `defineEmits`, etc.); these don't need to be
 imported and are transformed at compile-time into equivalent code; they aren't
 available at runtime.
 
-### JSDoc Type Definitions
+### Type definitions for JavaScript
 
-For now the code is in plain JS. But some type hinting can be provided by
-using `@type` and `@typedef` tags in JSDoc; VSCode will pick these up automatically,
-even across different files in the workspace.
+It is possible to use TypeScript types in [plain JavaScript
+projects](https://www.typescriptlang.org/docs/handbook/intro-to-js-ts.html);
+this code will attempt to demonstrate an approach to doing this.
 
-Definitions can be written like this:
+A TypeScript definitions file lives at `src/types.d.ts`. This file exports
+some interfaces as in a standard TS project:
+
+```typescript
+export interface TabData {
+	id: string,
+	label: string,
+	isActive: boolean,
+	disabled: boolean
+}
+```
+
+Inside the JavaScript Vue components, it is possible to get type hinting in
+VSCode (and likely many other editors) by "importing" these types in JSDoc `@type`
+tags:
 
 ```js
 /**
- * Data for a single tab
- *
- * @typedef {Object} TabData
- * @property {string} id
- * @property {string} label
- * @property {boolean} isActive
- * @property {boolean} disabled
+ * @type {import("../types").TabData}
  */
-
-/**
- * Map containing all data for all tabs, keyed by tab id.
- *
- * @typedef {Object.<string, TabData>} TabsData
- */
-
-// ...
-
-/**
- * @type {TabsData}
- */
-const tabsData = getTabsData();
+const tab = reactive( inject( 'tabsData' )[ props.id ] );
 ```
+
+Finally, for an extra level of type-checking, add a `// @ts-check` comment at the top
+of the file (or the script tag of a Vue SFC).
+
+With that line added, a properly-configured error will flag a line like:
+
+```js
+const bar = tab.bar
+
+// => "Property 'bar' does not exist on type 'TabData'."
+```
+
+Since these features come from the editor itself, there is no need to add a TypeScript
+dependency to `package.json` unless additional functionality is needed.
 
 ### Build Configuration
 
