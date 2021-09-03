@@ -108,7 +108,7 @@ Here's what gets generated currently:
 
 ```
 dist/vue-tabs.style.css		0.74 KiB / brotli: 0.25 KiB
-dist/vue-tabs.es.js			2.24 KiB / brotli: 0.96 KiB
+dist/vue-tabs.es.js		2.24 KiB / brotli: 0.96 KiB
 dist/vue-tabs.cjs.js		2.43 KiB / brotli: 0.93 KiB
 ```
 
