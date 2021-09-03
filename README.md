@@ -88,3 +88,40 @@ Definitions can be written like this:
  */
 const tabsData = getTabsData();
 ```
+
+### Build Configuration
+
+This demo uses Vite's [Library Mode](https://vitejs.dev/guide/build.html#library-mode)
+feature to generate files for distribution. This feature allows easy generation
+of bundles in multiple formats (UMD, ESM, CJS, IIFE). An alternate `src/lib.js`
+entry point has been provided that exports only the components themselves, not any
+of the demo scaffolding or the public `index.html` file.
+
+* Tree-shaking happens by default (any unused code will be eliminated from build)
+* Vue component templates are compiled into render functions
+* CSS is compiled into a separate stand-alone file that only includes component
+  style rules and inlined variables that were used (see CSS next config for
+  details)
+* Vue.js itself has been externalized and will not be included in the build.
+
+Here's what gets generated currently:
+
+```
+dist/vue-tabs.style.css		0.74 KiB / brotli: 0.25 KiB
+dist/vue-tabs.es.js			2.24 KiB / brotli: 0.96 KiB
+dist/vue-tabs.cjs.js		2.43 KiB / brotli: 0.93 KiB
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
