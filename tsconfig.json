@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "ESNext",
+		"strict": true,
+		"jsx": "preserve",
+		"moduleResolution": "node",
+		"allowJs": true,
+		"outDir": "dist",
+		"outFile": "types",
+		"declaration": true,
+		"emitDeclarationOnly": true,
+	},
+	"include": [
+		"src/**/*"
+	]
+}
