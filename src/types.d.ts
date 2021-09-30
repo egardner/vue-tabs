@@ -4,7 +4,3 @@ export interface TabData {
 	isActive: boolean,
 	disabled: boolean
 }
-
-export interface TabsData {
-	[key: string]: TabData
-}

@@ -12,13 +12,13 @@
 				@keydown.up.prevent="prev"
 			>
 				<div
-					v-for="( tab, index ) in tabsData"
+					v-for="( tab, key ) in tabsData"
 					:id="tab.id + '-label'"
 					:aria-selected="tab.id === currentTabId"
 					:aria-controls="tab.id"
 					:class="getLabelClasses( tab.id )"
 					class="vue-tabs__list__item"
-					:key="index"
+					:key="key"
 					role="tab"
 					tabindex="-1"
 					@click="select( tab.id )"
@@ -37,49 +37,42 @@
 	</div>
 </template>
 
-<script setup>
-// @ts-check
-
+<script setup lang="ts">
+import { TabData } from '../types';
+import { TabsKey } from '../symbols';
 import {
 	computed,
 	provide,
 	reactive,
-	useSlots
+	useSlots,
+	VNode
 } from 'vue';
 
-const props = defineProps( {
-	/**
-	 * Must match the id of one of the tabs. If this prop is not provided, the
-	 * inital active tab will be the first one in the markup structure.
-	 */
-	initialActive: {
-		type: String,
-		required: false
-	}
-} );
+const props = defineProps<{
+	initialActive?: string
+}>();
 
-const emit = defineEmits( [ 'tabchange' ] );
+// const emit = defineEmits( [ 'tabchange' ] );
+const emit = defineEmits<{
+	(e: 'tabchange', id: string): void
+}>();
+
+const contents = useSlots()?.default?.();
+if ( !contents ) {
+	throw new Error( `One or more <tab> components must be provided` );
+}
 
 /**
- * Data that will be exposed to the template and injected into the child Tab
- * components so that they can determine their appearance and behavior. Slot
- * content is always an array (of vdom nodes), but we want to reduce this to a
- * single keyed object for easier access to specific tabs.
- *
- * @type {import("../types").TabsData}
+ * Reactive record for all tabs that have been provided in the default slot
  */
-const tabsData = reactive( useSlots().default().reduce( ( map, item, currentIndex ) => {
-	/**
-	 * @param {import("vue").VNode<import("vue").RendererNode, import("vue").RendererElement, { [key: string]: any; }>} item
-	 * @param {number} currentIndex
-	 */
-	function isActive( item, currentIndex ) {
-		return props.initialActive ? 
-			( item.props.id === props.initialActive ) : 
-			( currentIndex === 0 );
+const tabsData = reactive( contents.reduce( ( map: Record<string, TabData>, item: VNode, currentIndex: number ) => {
+	function isActive( item: VNode, currentIndex: number ) : boolean {
+		const id = item?.props?.id;
+		const initialActive = props.initialActive;
+		return initialActive ? ( id === initialActive ) : ( currentIndex === 0 );
 	}
 
-	if ( item.props && item.props.id && item.props.label ) {
+	if ( item && item.props && item.props.id && item.props.label ) {
 		map[ item.props.id ] = {
 			id: item.props.id,
 			label: item.props.label,
@@ -92,16 +85,16 @@ const tabsData = reactive( useSlots().default().reduce( ( map, item, currentInde
 }, {} ) );
 
 /**
- * Computed ref that returns a string
+ * Reactive string ID of the active tab
  */
 const currentTabId = computed( () => {
 	return Object.values( tabsData ).find( ( tab ) => {
 		return tab.isActive === true;
-	} ).id;
+	} )?.id;
 } );
 
 /**
- * Computed ref that returns a number
+ * Reactive numerical index of the active tab
  */
 const currentTabIndex = computed( () => {
 	return Object.keys( tabsData ).findIndex( ( id ) => {
@@ -111,10 +104,9 @@ const currentTabIndex = computed( () => {
 } );
 
 /**
- * @param {string} id
- * @emits tabchange
+ * Set the target tab to active
  */
-function select ( id ) {
+function select ( id: string ) {
 	if ( tabsData[ id ].disabled ) return;
 
 	Object.keys( tabsData ).forEach( id => { tabsData[ id ].isActive = false; });
@@ -122,11 +114,7 @@ function select ( id ) {
 	emit( 'tabchange', id );
 }
 
-/**
- * @param {string} id
- * @returns {Object.<string, boolean>} class object
- */
-function getLabelClasses( id ) {
+function getLabelClasses( id: string ) {
 	return {
 		'vue-tabs__list__item--current': id === currentTabId.value,
 		'vue-tabs__list__item--disabled': tabsData[ id ].disabled,
@@ -134,7 +122,7 @@ function getLabelClasses( id ) {
 }
 
 /**
- * Set the tab immediately after the currently active one as active
+ * Select the next tab in the markup, if one exists
  */
 function next () {
 	const ids = Object.keys( tabsData );
@@ -143,7 +131,7 @@ function next () {
 }
 
 /**
- * Set the tab immediately before the currently active one as active
+ * Select the previous tab in the markup, if one exists
  */
 function prev () {
 	const ids = Object.keys( tabsData );
@@ -152,7 +140,7 @@ function prev () {
 }
 
 // Provide the tabsData object to the child Tab components
-provide( 'tabsData', tabsData );
+provide( TabsKey, tabsData );
 </script>
 
 <style lang="postcss">

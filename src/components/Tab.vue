@@ -11,36 +11,20 @@
 	</div>
 </template>
 
-<script setup>
-// @ts-check
-
+<script setup lang="ts">
 import { reactive, inject } from 'vue';
+import { TabsKey } from '../symbols';
 
-// Tab instances must have a label and an id; the latter must be unique
-// but there is no way to validate for that here; we may want to enforce
-// uniqueness at the level of the parent.
-const props = defineProps( {
-	label: {
-		type: String,
-		required: true
-	},
+const props = defineProps<{
+	label: string,
+	id: string,
+	disabled?: boolean
+}>();
 
-	id: {
-		type: String,
-		required: true
-	},
+const tabsData = inject( TabsKey );
+if ( !tabsData ) {
+	throw new Error( 'Tab component must used inside a parent Tabs component' );
+}
 
-	disabled: {
-		type: Boolean,
-		default: false
-	}
-} );
-
-/**
- * @type {import("../types").TabData}
- */
-const tab = reactive( inject( 'tabsData' )[ props.id ] );
+const tab = reactive( tabsData[ props.id ] );
 </script>
-
-<style>
-</style>

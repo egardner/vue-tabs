@@ -2,7 +2,9 @@
   "name": "vue-tabs",
   "version": "0.0.0",
   "license": "MIT",
-  "files": [ "dist" ],
+  "files": [
+    "dist"
+  ],
   "main": "./dist/vue-tabs.cjs.js",
   "module": "./dist/vue-tabs.es.js",
   "exports": {
@@ -28,6 +30,7 @@
     "postcss-custom-properties": "^11.0.0",
     "postcss-nested": "^5.0.6",
     "postcss-remove-root": "^0.0.2",
+    "typescript": "^4.4.3",
     "vite": "^2.5.2"
   }
 }
